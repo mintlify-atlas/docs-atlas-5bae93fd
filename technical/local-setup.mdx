@@ -1,0 +1,98 @@
+---
+title: "Local development setup"
+description: "Run Gimnasio USM frontend locally for development."
+---
+
+This page walks you through getting the Gimnasio USM frontend running on your machine for local development.
+
+## Prerequisites
+
+- **Node.js** — any version supported by Vite 8
+- **Django backend** — must be running at `http://localhost:8000` before you start the frontend
+
+<Note>
+  The frontend expects the Django REST API to be available at `http://localhost:8000/api/`. Start the backend first, or all API calls will fail with a network error.
+</Note>
+
+## Setup steps
+
+<Steps>
+  <Step title="Clone the repository">
+    ```bash
+    git clone https://github.com/BrancoEbs/usm-fitness-frontend.git
+    cd usm-fitness-frontend
+    ```
+  </Step>
+
+  <Step title="Install dependencies">
+    <CodeGroup>
+
+    ```bash npm
+    npm install
+    ```
+
+    ```bash yarn
+    yarn install
+    ```
+
+    ```bash pnpm
+    pnpm install
+    ```
+
+    </CodeGroup>
+
+    This installs all runtime and dev dependencies defined in `package.json`, including React 19, React Router 7, Axios, Vite 8, Tailwind CSS, and ESLint.
+  </Step>
+
+  <Step title="Start the development server">
+    ```bash
+    npm run dev
+    ```
+
+    Vite starts a local dev server with hot module replacement (HMR). The terminal output shows the local URL, typically `http://localhost:5173`.
+  </Step>
+
+  <Step title="Open the app">
+    Navigate to the URL shown in the terminal output. The app connects to the Django backend at `http://localhost:8000/api/`. Log in with a valid backend account to start using the application.
+  </Step>
+</Steps>
+
+## Available scripts
+
+All scripts are defined in `package.json` and run via npm:
+
+| Script | Command | Description |
+|--------|---------|-------------|
+| `dev` | `vite` | Start the local development server with HMR |
+| `build` | `vite build` | Compile and bundle for production (outputs to `dist/`) |
+| `preview` | `vite preview` | Serve the production build locally for testing |
+| `lint` | `eslint .` | Run ESLint across the entire project |
+
+## Backend URL configuration
+
+The API base URL is set in a single location — `src/api/axios.js`:
+
+```javascript src/api/axios.js
+const api = axios.create({
+    baseURL: 'http://localhost:8000/api/',
+});
+```
+
+If your Django backend runs on a different port or host, update the `baseURL` value here. This one change affects all API calls across the entire frontend.
+
+## Related pages
+
+<CardGroup cols={2}>
+  <Card title="Deployment" icon="rocket" href="/technical/deployment">
+    Build and deploy the frontend for production.
+  </Card>
+  <Card title="API overview" icon="plug" href="/technical/api-overview">
+    Base URL, authentication, and resource groups.
+  </Card>
+  <Card title="Architecture overview" icon="diagram-project" href="/technical/architecture">
+    How the React SPA and Django backend fit together.
+  </Card>
+  <Card title="Authentication" icon="key" href="/technical/authentication">
+    JWT login flow and token handling.
+  </Card>
+</CardGroup>

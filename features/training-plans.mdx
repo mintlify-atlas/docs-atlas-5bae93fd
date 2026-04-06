@@ -1,0 +1,64 @@
+---
+title: "My training plans"
+description: "Access the workout routines your coach has designed for you."
+---
+
+The **Mis Rutinas de Entrenamiento** page shows all training plans available to you. These include plans shared with all students as well as plans your coach has assigned specifically to you.
+
+## Plan types
+
+When your plans load, each one is labeled with a badge indicating its scope:
+
+| Type | Badge | Description |
+|------|-------|-------------|
+| **Plan Global** | Blue badge | Designed for all students in the gym. Every student sees these plans. |
+| **Plan Personal** | Green badge | Assigned to you individually by your coach. Only you can see it. |
+
+The backend filters plans automatically using your authentication token — you only receive the global plans and the personal plans assigned to your account.
+
+## Plan header information
+
+Each plan card shows:
+
+- **Title** — the name of the training plan
+- **Designer** — the coach who created it, shown as `Diseñado por: [name]`. Global plans default to `USM Fitness` if no specific coach name is set.
+- **Expiry date** — the date until which the plan is valid (`Válido hasta: DD/MM/YYYY`)
+
+## Exercise cards
+
+Within each plan, exercises are displayed in a grid. Each exercise card shows:
+
+- **Muscle group tag** — a label in the top-right corner of the card indicating the targeted muscle group (e.g., `PECHO`, `PIERNAS`, `ESPALDA`)
+- **Exercise number** — a sequential index within the plan
+- **Exercise name** — the full name of the exercise
+- **Sets, reps, and rest** — displayed in a three-column grid:
+  - **Series** — number of sets
+  - **Reps** — number of repetitions per set
+  - **Descanso** — rest time in seconds between sets
+
+### Video tutorials
+
+If an exercise has a tutorial video linked, a **Ver Video Tutorial** button appears at the bottom of the card. Clicking it opens the video in a new tab.
+
+Not all exercises have video links — the button only appears when a `video_url` is set for that exercise.
+
+## Empty plan
+
+If a plan exists but the coach has not yet added exercises to it, the plan card shows:
+
+> El entrenador aún no ha añadido ejercicios a este plan.
+
+<Note>
+  If the page shows no plans at all, your coach has not yet assigned any routines to your account. Contact your trainer directly and ask them to create a plan for you using the [routine manager](/features/routine-manager). Global plans are visible to all students, so if none appear, the gym may not have any published yet.
+</Note>
+
+---
+
+<CardGroup cols={2}>
+  <Card title="Fitness profile" icon="user-check" href="/features/fitness-profile">
+    Keep your physical data updated so your coach can tailor these plans to you.
+  </Card>
+  <Card title="Book a training session" icon="calendar-check" href="/features/booking">
+    Reserve a spot in a training block to put your plan into practice.
+  </Card>
+</CardGroup>

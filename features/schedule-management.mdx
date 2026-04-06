@@ -1,0 +1,77 @@
+---
+title: "Schedule management"
+description: "Control the gym's weekly training schedule, assign coaches, and set capacity."
+---
+
+The schedule management page gives admins full control over the gym's operational state and weekly training blocks. From here you can open or close the gym for all users and configure each training block's assigned coach and capacity.
+
+## Master switch
+
+The Master Switch (Interruptor Maestro) controls whether the gym is open or closed for the entire platform. This setting affects all students immediately — when the gym is closed, the booking page is replaced with the closure message you define.
+
+### Opening or closing the gym
+
+<Steps>
+  <Step title="Navigate to schedule management">
+    Go to **Gestión de Horarios** from the admin navigation.
+  </Step>
+  <Step title="Toggle the switch">
+    Click the toggle next to the Master Switch. The label changes between **ABIERTO (Normal)** and **CERRADO (Modo Vacaciones)**.
+  </Step>
+  <Step title="Enter a closure message (if closing)">
+    When the gym is set to closed, a text field appears. Enter a message explaining the closure — for example: `Cerrado por Vacaciones de Invierno`. This message is shown to all students on the home page in place of the booking interface.
+  </Step>
+  <Step title="Apply the change">
+    Click **Aplicar Cambios** to save. The change takes effect immediately across the platform.
+  </Step>
+</Steps>
+
+<Note>
+  When the gym is open, the closure message field is hidden. Reopening the gym clears the message from the student view.
+</Note>
+
+## Weekly schedule
+
+The **Planificación de la Semana** section displays all training blocks for the current week, grouped by date inside an accordion. Each day shows a count of its modules. Click a day header to expand it and view its blocks.
+
+Each block in the expanded table shows:
+
+- **Módulo / Hora** — the module code (e.g. `MÓDULO 1`) and its start and end times
+- **Entrenador** — a dropdown listing all users with role Coach (Entrenador) or Admin; select one to assign them to the block, or leave it as `-- Sin Asignar --`
+- **Aforo** — the regular capacity (`aforo_regular`); a numeric input you can change directly in the table
+
+### Editing a training block
+
+<Steps>
+  <Step title="Expand the day">
+    Click the day header in the weekly schedule accordion to reveal its blocks.
+  </Step>
+  <Step title="Select a coach">
+    In the **Entrenador** dropdown for the target block, select the coach you want to assign. Only users with role 2 (Entrenador) or role 3 (Admin) appear in this list.
+  </Step>
+  <Step title="Set the capacity">
+    Edit the number in the **Aforo** column to set the regular capacity for that block.
+  </Step>
+  <Step title="Save the block">
+    Click **Guardar** on that row. The changes are saved permanently to the backend.
+  </Step>
+</Steps>
+
+## Deleting a block
+
+Each block row has a delete button (trash icon). Clicking it triggers a confirmation prompt before the block is removed.
+
+<Warning>
+  Deleting a training block permanently cancels all existing reservations that students have made for that block. This action cannot be undone. Students are not automatically notified, so communicate schedule changes in advance when possible.
+</Warning>
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="User management" icon="users" href="/features/user-management">
+    Assign roles to coaches and admins who appear in the block assignment dropdown.
+  </Card>
+  <Card title="Attendance" icon="clipboard-user" href="/features/attendance">
+    Coaches use attendance control to mark presence for students in each block.
+  </Card>
+</CardGroup>

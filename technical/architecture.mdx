@@ -1,0 +1,125 @@
+---
+title: "Architecture overview"
+description: "How Gimnasio USM is built — React frontend communicating with a Django REST API."
+---
+
+Gimnasio USM is a single-page application built with React. The frontend communicates exclusively with a Django REST backend over HTTP. There is no server-side rendering — all routing and view logic lives in the browser.
+
+## Stack
+
+| Layer | Technology | Version |
+|---|---|---|
+| UI framework | React | 19 |
+| Build tool | Vite | 8 |
+| Styling | Tailwind CSS | 3 |
+| Routing | React Router | 7 |
+| HTTP client | Axios | 1 |
+| Backend | Django REST Framework | — |
+
+## Backend connection
+
+The frontend targets a Django REST API at `http://localhost:8000/api/`. All requests go through a single Axios instance defined in `src/api/axios.js`:
+
+```javascript src/api/axios.js
+import axios from 'axios';
+
+const api = axios.create({
+    baseURL: 'http://localhost:8000/api/',
+});
+
+// Interceptor: automatically attaches the token to every request
+api.interceptors.request.use((config) => {
+    const token = localStorage.getItem('access_token');
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+});
+
+export default api;
+```
+
+The request interceptor reads `access_token` from `localStorage` and injects it as a `Bearer` header before every outgoing request. If no token is present, the request goes out unauthenticated.
+
+## Authentication
+
+JWT tokens are stored in `localStorage` under two keys:
+
+- `access_token` — included in every API request via the Axios interceptor
+- `refresh_token` — stored for future token refresh flows
+
+See [Authentication](/technical/authentication) for the full login flow.
+
+## Route structure
+
+React Router v7 defines all routes in `src/App.jsx`. Routes are divided into four groups by access level, enforced by the `ProtectedRoute` component:
+
+| Group | Allowed roles | Routes |
+|---|---|---|
+| Public | Anyone | `/login`, `/registro` |
+| All authenticated users | 1, 2, 3 | `/`, `/planes`, `/ficha`, `/reservas` |
+| Coaches and admins | 2, 3 | `/asistencia`, `/entrenador/rutinas`, `/fichas-alumnos` |
+| Admins only | 3 | `/admin/bloques`, `/admin/usuarios` |
+
+### ProtectedRoute component
+
+`ProtectedRoute` wraps each access group. On mount it calls `GET /api/usuarios/me/` to verify the current user's role. If the role is not in `allowedRoles`, the user is redirected to `/`.
+
+```jsx src/components/ProtectedRoute.jsx
+import { useState, useEffect } from 'react';
+import { Navigate, Outlet } from 'react-router-dom';
+import api from '../api/axios';
+
+export default function ProtectedRoute({ allowedRoles }) {
+    const [isAuthorized, setIsAuthorized] = useState(null);
+
+    useEffect(() => {
+        const verificarPermisos = async () => {
+            try {
+                const res = await api.get('usuarios/me/');
+
+                if (allowedRoles.includes(res.data.rol)) {
+                    setIsAuthorized(true);
+                } else {
+                    setIsAuthorized(false);
+                }
+            } catch (error) {
+                setIsAuthorized(false);
+            }
+        };
+
+        verificarPermisos();
+    }, [allowedRoles]);
+
+    if (isAuthorized === null) {
+        return (
+            <div>
+                <p>Verificando credenciales...</p>
+            </div>
+        );
+    }
+
+    return isAuthorized ? <Outlet /> : <Navigate to="/" replace />;
+}
+```
+
+While the role check is in flight, the component renders a loading state. Once resolved, it either renders the child route via `<Outlet />` or redirects to `/`.
+
+See [Role system](/technical/role-system) for a full breakdown of roles and their permissions.
+
+## Related pages
+
+<CardGroup cols={2}>
+  <Card title="Authentication" icon="key" href="/technical/authentication">
+    JWT login flow and token handling.
+  </Card>
+  <Card title="Role system" icon="shield" href="/technical/role-system">
+    The three user roles and what each can access.
+  </Card>
+  <Card title="API overview" icon="plug" href="/technical/api-overview">
+    Base URL, endpoints, and request conventions.
+  </Card>
+  <Card title="Local setup" icon="laptop" href="/technical/local-setup">
+    Run the project on your machine.
+  </Card>
+</CardGroup>

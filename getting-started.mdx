@@ -1,0 +1,116 @@
+---
+title: "Getting started"
+description: "Create your account and make your first session reservation on Gimnasio USM."
+---
+
+Gimnasio USM lets you book training blocks, track your fitness profile, and access your workout routines — all from one platform. This guide walks you through creating your account and making your first reservation.
+
+<Note>
+  Your role (student, coach, or admin) is assigned by an administrator after registration. New accounts default to the student role until updated.
+</Note>
+
+## Steps to get started
+
+<Steps>
+  <Step title="Register with your RUT">
+    Go to `/registro` and fill in your details. The registration form collects the following fields:
+
+    | Field | Notes |
+    |-------|-------|
+    | **RUT** | Chilean national ID, auto-formatted as you type (e.g. `12345678-9`) |
+    | **Nombres** | Your first name(s) |
+    | **Apellido Paterno** | Your paternal surname |
+    | **Apellido Materno** | Your maternal surname |
+    | **Carrera** | Your academic programme (e.g. Ingeniería en Informática) |
+    | **Contraseña** | Minimum 8 characters |
+    | **Confirmar Contraseña** | Must match the password field |
+
+    <Tip>
+      The RUT field strips any non-numeric characters automatically and inserts the hyphen before the verification digit as you type. You do not need to format it manually — just type the digits and the `K` if applicable.
+    </Tip>
+
+    Once submitted, the form posts to `usuarios/registro/` on the backend. If the RUT is already registered, you will see an error message.
+  </Step>
+
+  <Step title="Log in">
+    Go to `/login` and enter your credentials.
+
+    ```text Login form fields
+    RUT o Usuario  →  e.g. 12345678-9
+    Contraseña     →  your password
+    ```
+
+    The RUT field on the login page also formats your input automatically as you type. The app sends your credentials to the `token/` endpoint and stores the returned JWT tokens in `localStorage` under the keys `access_token` and `refresh_token`.
+
+    <Note>
+      All subsequent API requests are authenticated automatically. The Axios instance attaches the `access_token` as a `Bearer` header on every request.
+    </Note>
+
+    After a successful login you are redirected to `/`, the home page, where available training blocks are displayed.
+  </Step>
+
+  <Step title="Browse available training blocks">
+    The home page (`/`) shows all upcoming training blocks grouped by date. Each block card displays:
+
+    - The block code and time slot (e.g. `07:00 - 08:30`)
+    - The number of available spots (`cupos_disponibles`)
+    - The assigned coach's name
+
+    Click a date header to expand its blocks. The first date with available blocks is expanded automatically when the page loads.
+
+    <Warning>
+      If an administrator has closed the gym, you will see a "Gimnasio Cerrado" screen instead of the booking grid. No reservations can be made while the gym is closed.
+    </Warning>
+  </Step>
+
+  <Step title="Make your first reservation">
+    Click **Reservar** on any block card with available spots. The app posts to `reservas/` with the block ID and date.
+
+    If a block is fully booked (`cupos_disponibles === 0`) and you hold the `es_seleccionado` flag, a **Reservar (Sobrecupo)** button appears, letting you join the waitlist beyond the normal capacity limit. Students without this flag see an **Agotado** (fully booked) state instead.
+
+    After a successful reservation, the block list reloads automatically to reflect the updated spot count.
+  </Step>
+</Steps>
+
+## Role-based navigation
+
+After login, the navbar adapts to your role. The platform uses three roles, identified by the `rol` field returned from `usuarios/me/`:
+
+| Role | Value | Navbar links |
+|------|-------|--------------|
+| **Alumno** (student) | `1` | Inicio, Mis Reservas, Mi Ficha, Mis Rutinas |
+| **Entrenador** (coach) | `2` | Inicio, Asistencia, Gestor de Rutinas, Gestión Horarios, Fichas Alumnos |
+| **Admin** | `3` | Inicio, Asistencia, Gestión Horarios, Gestión Usuarios |
+
+<Note>
+  Route access is enforced on the server side via the `ProtectedRoute` component, which calls `usuarios/me/` on every navigation to verify your role before rendering the page. If your token is expired or your role does not match the required roles for a route, you are redirected to the home page.
+</Note>
+
+## Backend connection
+
+The frontend connects to the Django backend using a shared Axios instance. The default base URL is:
+
+```text Default API base URL
+http://localhost:8000/api/
+```
+
+<Note>
+  To point the frontend at a different backend (for example, a staging server), update the `baseURL` value in `src/api/axios.js`.
+</Note>
+
+## Explore the platform
+
+<CardGroup cols={2}>
+  <Card title="Book a session" icon="calendar-check" href="/features/booking">
+    Browse training blocks by date and reserve your spot.
+  </Card>
+  <Card title="My reservations" icon="list-check" href="/features/my-reservations">
+    View upcoming and past reservations, and cancel when needed.
+  </Card>
+  <Card title="Fitness profile" icon="user-check" href="/features/fitness-profile">
+    Record your physical data, injuries, and training objectives.
+  </Card>
+  <Card title="Training plans" icon="clipboard-list" href="/features/training-plans">
+    Access workout plans assigned by your coach.
+  </Card>
+</CardGroup>

@@ -1,0 +1,60 @@
+---
+title: "Fitness profile"
+description: "Maintain your physical data so coaches can tailor your training."
+---
+
+Your fitness profile (`Mi Ficha Física`) stores the physical data your coaches use to adapt your training sessions and workout plans. Keeping it up to date helps trainers assign appropriate exercises and flag anything that may affect your safety.
+
+## Profile fields
+
+The form contains four fields, all required:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| **Peso Actual (kg)** | Number (decimals allowed) | Your current body weight in kilograms. Example: `75.5` |
+| **Estatura (cm)** | Number | Your height in centimeters. Example: `175` |
+| **Objetivo Principal** | Text | Your primary training goal. Example: `Ganar masa muscular`, `Bajar de peso`, `Rendimiento` |
+| **Lesiones Previas o Molestias** | Text (multiline) | Any prior injuries or physical conditions the coach should know about. Write `Ninguna` if none apply |
+
+## First visit vs. returning visits
+
+The form detects whether you already have a profile saved and adjusts the save button accordingly:
+
+<Steps>
+  <Step title="Navigate to Mi Ficha Física">
+    Open the fitness profile page from the navigation bar. The page loads your existing data if a profile already exists, or presents a blank form if this is your first visit.
+  </Step>
+  <Step title="Fill in all four fields">
+    Enter your current weight, height, training objective, and any prior injuries or discomfort. All fields are required before you can save.
+  </Step>
+  <Step title="Save your profile">
+    Click **Crear Ficha** (first time) or **Actualizar Ficha** (returning visits). A confirmation message appears when the data is saved successfully.
+  </Step>
+</Steps>
+
+On your first submission, a new fitness record is created via `POST`. On subsequent visits, the same record is updated via `PATCH` — your data is never duplicated.
+
+## Coach notes panel
+
+Alongside the form, a read-only panel titled **Notas del Coach** displays any observations your trainer has written about your profile. This may include notes on your progress, specific exercise restrictions, or technique feedback.
+
+You cannot edit this panel. Only coaches and admins can write to the trainer observations field.
+
+If your trainer has not left any notes yet, the panel shows:
+
+> Tu entrenador aún no ha dejado observaciones en tu perfil.
+
+<Note>
+  Coach notes are written from the [student records](/features/student-records) view, accessible only to coaches and admins. If you want to discuss your profile with your trainer, do so directly — you cannot send messages through the platform.
+</Note>
+
+---
+
+<CardGroup cols={2}>
+  <Card title="Training plans" icon="clipboard-list" href="/features/training-plans">
+    Access the workout routines your coach has designed for you.
+  </Card>
+  <Card title="My reservations" icon="list-check" href="/features/my-reservations">
+    View and manage your training session reservations.
+  </Card>
+</CardGroup>

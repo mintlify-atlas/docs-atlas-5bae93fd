@@ -1,0 +1,84 @@
+---
+title: "Deployment"
+description: "Build and deploy the Gimnasio USM frontend for production."
+---
+
+Gimnasio USM is a Vite-powered React SPA. Building for production compiles and bundles all assets into a static `dist/` directory that you can serve from any static hosting service or web server.
+
+<Warning>
+  Before building for production, update the `baseURL` in `src/api/axios.js` to point to your production Django backend. If you forget, the deployed frontend will call `http://localhost:8000/api/` — which will fail in every user's browser.
+</Warning>
+
+## Build and deploy steps
+
+<Steps>
+  <Step title="Update the API base URL">
+    Open `src/api/axios.js` and set `baseURL` to your production backend URL:
+
+    ```javascript src/api/axios.js
+    const api = axios.create({
+        baseURL: 'https://your-production-domain.com/api/',
+    });
+    ```
+
+    This is the only environment-specific value you need to change. All API calls throughout the app use this shared instance.
+  </Step>
+
+  <Step title="Run the production build">
+    ```bash
+    npm run build
+    ```
+
+    Vite compiles and optimizes the application. The output is written to the `dist/` directory. You will see a summary of generated files and their sizes in the terminal.
+  </Step>
+
+  <Step title="Preview the build locally (optional)">
+    Before uploading, verify the production build works correctly on your machine:
+
+    ```bash
+    npm run preview
+    ```
+
+    Vite serves the `dist/` directory at a local URL (typically `http://localhost:4173`). This runs the same static output that will be deployed — it is the most accurate way to catch issues before going live.
+  </Step>
+
+  <Step title="Deploy the dist/ directory">
+    Upload the contents of `dist/` to your hosting provider. The output is entirely static — HTML, CSS, JavaScript, and assets — so it can be served from any platform that supports static files, such as a CDN, Nginx, Apache, or a managed static hosting service.
+
+    Configure your hosting to redirect all requests to `index.html` so that React Router can handle client-side navigation for all routes.
+  </Step>
+</Steps>
+
+## Build output
+
+The `dist/` directory produced by `npm run build` contains:
+
+| File / folder | Contents |
+|---------------|----------|
+| `index.html` | Entry point for the SPA |
+| `assets/` | Hashed JS and CSS bundles, fonts, and static assets |
+
+Vite applies code splitting, tree shaking, and asset hashing automatically. You do not need to configure these optimizations manually.
+
+## SPA routing
+
+Because Gimnasio USM uses React Router for all navigation, every URL path must resolve to `index.html` on the server. Without this, users who navigate directly to a deep link (e.g. `/admin/bloques`) will receive a 404.
+
+Configure a catch-all fallback rule on your hosting platform. The exact configuration depends on the provider, but the behavior is always the same: serve `index.html` for any path that does not match a real file.
+
+## Related pages
+
+<CardGroup cols={2}>
+  <Card title="Local setup" icon="laptop" href="/technical/local-setup">
+    Run the frontend locally for development.
+  </Card>
+  <Card title="API overview" icon="plug" href="/technical/api-overview">
+    Base URL and backend connection details.
+  </Card>
+  <Card title="Architecture overview" icon="diagram-project" href="/technical/architecture">
+    How the React SPA and Django backend fit together.
+  </Card>
+  <Card title="Authentication" icon="key" href="/technical/authentication">
+    JWT login flow and token handling.
+  </Card>
+</CardGroup>

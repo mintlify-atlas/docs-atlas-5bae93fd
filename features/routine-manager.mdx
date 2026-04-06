@@ -1,0 +1,96 @@
+---
+title: "Routine manager"
+description: "Build and assign personalized or global workout plans for students."
+---
+
+The routine manager — labelled "Laboratorio de Rutinas" in the interface — is the primary tool for coaches to build and assign workout plans. It is organized into two tabs: **Catálogo de Ejercicios** and **Planes de Entrenamiento**.
+
+<Tabs>
+  <Tab title="Exercise catalog">
+
+## Exercise catalog
+
+The exercise catalog is a shared library of movements that can be reused across any training plan.
+
+### Adding an exercise
+
+Fill in the form on the left side of the catalog view:
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| **Nombre del Ejercicio** | Yes | The exercise name (e.g. "Press Banca") |
+| **Grupo Muscular** | Yes | The target muscle group (e.g. "Pecho") |
+| **Link de Video (YouTube)** | No | A YouTube URL for a tutorial video |
+| **Descripción / Tips** | No | Coaching cues, technique notes, or tips |
+
+Click **Guardar Ejercicio** to save the exercise to the catalog. It immediately appears in the exercise grid on the right.
+
+### Browsing exercises
+
+Exercises are displayed as cards in a two-column grid. Each card shows the **muscle group** label, the **exercise name**, a short **description** or tips, and a **Ver Video Tutorial** link if a YouTube URL was provided.
+
+  </Tab>
+  <Tab title="Training plans">
+
+## Training plans
+
+The training plans tab is where you create plans and assign exercises from the catalog to them.
+
+### Creating a plan
+
+<Steps>
+  <Step title="Fill in the plan details">
+    In the left panel, enter:
+    - **Título del Plan** — a descriptive name (e.g. "Rutina Hipertrofia 3 Días")
+    - **Es un Plan Global** — check this box to make the plan available to all students; leave it unchecked for a personal plan
+    - **Asignar a Alumno** — appears only when the plan is not global; use the smart search dropdown to find a student by name or RUT
+    - **Fecha de Vencimiento** — the date the plan expires
+  </Step>
+  <Step title="Create the empty plan">
+    Click **Crear Plan Vacío**. The plan is saved to the backend and appears in the plan selector on the right.
+
+    <Note>
+      Personal plans require a student to be selected. The form will not submit without one.
+    </Note>
+  </Step>
+  <Step title="Select the plan to edit">
+    Use the smart search dropdown labelled **Editar Rutina** to find the plan you just created. Plans are listed with a prefix indicating their type:
+    - 🌍 `GLOBAL` — available to all students
+    - 👤 `PERSONAL` — assigned to a specific student
+
+    Selecting a plan opens the exercise builder below.
+  </Step>
+  <Step title="Add exercises from the catalog">
+    Inside the exercise builder, fill in the detail row:
+
+    | Field | Description |
+    |-------|-------------|
+    | **Ejercicio del Catálogo** | Select an exercise from the catalog dropdown |
+    | **Series** | Number of sets (numeric) |
+    | **Reps** | Repetitions — accepts text values such as `10-12` or `Al fallo` |
+    | **Desc(s)** | Rest time in seconds between sets |
+
+    Click **Añadir** to append the exercise to the plan.
+  </Step>
+  <Step title="Review the complete plan">
+    Each exercise added to the plan appears as a numbered row showing the exercise name, series count, repetition range, and rest time. Repeat step 4 for each exercise in the routine.
+  </Step>
+</Steps>
+
+### Smart search dropdown
+
+Both the student selector (when creating a personal plan) and the plan selector (when editing) use a smart search component. Click the field to open a searchable dropdown, then type to filter results in real time. Click **✖ Quitar selección** to clear the current value.
+
+  </Tab>
+</Tabs>
+
+## Related pages
+
+<CardGroup cols={2}>
+  <Card title="Student records" icon="folder-open" href="/features/student-records">
+    Review a student's physical file and injuries before designing their routine.
+  </Card>
+  <Card title="Training plans (student view)" icon="clipboard-list" href="/features/training-plans">
+    See how students access and follow the plans you create here.
+  </Card>
+</CardGroup>

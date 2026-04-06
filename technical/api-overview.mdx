@@ -1,0 +1,87 @@
+---
+title: "API overview"
+description: "How the Gimnasio USM frontend communicates with the Django REST backend."
+---
+
+All data in Gimnasio USM flows through a single Django REST API. The React frontend never talks to any other backend — every feature from block reservations to fitness files is backed by an HTTP call to this API.
+
+## Base URL
+
+```
+http://localhost:8000/api/
+```
+
+<Note>
+  The base URL is defined in `src/api/axios.js`. Update the `baseURL` value there before building for any environment other than local development.
+</Note>
+
+## Axios instance
+
+All requests in the frontend go through a single shared Axios instance. It is defined in `src/api/axios.js` and imported throughout the application:
+
+```javascript src/api/axios.js
+import axios from 'axios';
+
+const api = axios.create({
+    baseURL: 'http://localhost:8000/api/', // La URL de tu backend en Django
+});
+
+// Interceptor: Automáticamente le pega el Token a todas tus peticiones
+api.interceptors.request.use((config) => {
+    const token = localStorage.getItem('access_token');
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+});
+
+export default api;
+```
+
+The request interceptor runs before every outgoing request. It reads `access_token` from `localStorage` and injects it as a `Bearer` token in the `Authorization` header. If no token is present — for example, on the login page — the request goes out unauthenticated.
+
+## Authentication
+
+The API uses Bearer JWT tokens. After a successful login, the frontend stores two tokens in `localStorage`:
+
+| Key | Purpose |
+|-----|---------|
+| `access_token` | Sent in the `Authorization` header with every request |
+| `refresh_token` | Stored for future token refresh flows |
+
+The interceptor in `src/api/axios.js` handles header injection automatically. You do not need to set the header manually in individual pages or components.
+
+See [Authentication](/technical/authentication) for the full login and token flow.
+
+## Resource groups
+
+The API is organized into the following resource groups:
+
+| Resource | Base path | Used by |
+|----------|-----------|---------|
+| Tokens | `/api/token/` | Login page |
+| Users | `/api/usuarios/` | All authenticated pages |
+| Training blocks | `/api/bloques/` | Home, attendance, schedule management |
+| Reservations | `/api/reservas/` | Home, my reservations, attendance |
+| Fitness files | `/api/fichafisica/` | Fitness profile, student records |
+| Training plans | `/api/planes/` | My plans, routine manager |
+| Exercises | `/api/ejercicios/` | Routine manager |
+| Routine details | `/api/detallerutina/` | Routine manager |
+| Configuration | `/api/configuracion/` | Home, schedule management |
+
+## Full endpoint reference
+
+<CardGroup cols={2}>
+  <Card title="API endpoints" icon="list" href="/technical/api-endpoints">
+    Complete reference for every endpoint — request parameters, response fields, and curl examples.
+  </Card>
+  <Card title="Authentication" icon="key" href="/technical/authentication">
+    JWT login flow, token storage, and the interceptor in detail.
+  </Card>
+  <Card title="Local setup" icon="laptop" href="/technical/local-setup">
+    Run the frontend and backend together on your machine.
+  </Card>
+  <Card title="Architecture overview" icon="diagram-project" href="/technical/architecture">
+    How the React SPA and Django backend fit together.
+  </Card>
+</CardGroup>

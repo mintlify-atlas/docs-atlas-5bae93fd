@@ -1,0 +1,138 @@
+---
+title: "Role system"
+description: "Understanding the three user roles and their access permissions."
+---
+
+Every user in Gimnasio USM is assigned a numeric role that controls which routes and features they can access. The `ProtectedRoute` component enforces these restrictions on every navigation event.
+
+## Roles
+
+| ID | Name | Spanish label |
+|---|---|---|
+| `1` | Student | Alumno |
+| `2` | Coach | Entrenador |
+| `3` | Admin | Administrador |
+
+<Note>
+  Only admins (role 3) can change a user's role. Students register with role 1 by default and cannot elevate their own permissions.
+</Note>
+
+## Route access by role
+
+The route groups defined in `src/App.jsx` map directly to `allowedRoles` arrays passed to `ProtectedRoute`:
+
+| Route | Path | Roles |
+|---|---|---|
+| Home | `/` | 1, 2, 3 |
+| Training plans | `/planes` | 1, 2, 3 |
+| Fitness profile | `/ficha` | 1, 2, 3 |
+| My reservations | `/reservas` | 1, 2, 3 |
+| Attendance | `/asistencia` | 2, 3 |
+| Routine manager | `/entrenador/rutinas` | 2, 3 |
+| Student records | `/fichas-alumnos` | 2, 3 |
+| Schedule management | `/admin/bloques` | 3 |
+| User management | `/admin/usuarios` | 3 |
+
+Public routes (`/login`, `/registro`) do not require a role — they are accessible to anyone.
+
+## Role features
+
+<CardGroup cols={3}>
+  <Card title="Student (role 1)" icon="user" href="/features/booking">
+    Can book gym slots, view their own fitness profile, see training plans, and manage their reservations.
+  </Card>
+  <Card title="Coach (role 2)" icon="dumbbell" href="/features/attendance">
+    All student access, plus attendance tracking, the routine manager, and access to student fitness records.
+  </Card>
+  <Card title="Admin (role 3)" icon="shield" href="/features/user-management">
+    Full access. Can also manage the gym schedule and administer user accounts including role assignments.
+  </Card>
+</CardGroup>
+
+## The `es_seleccionado` flag
+
+Students can carry an additional flag: `es_seleccionado`. When this is `true`, the student is a selected athlete and can book overflow slots that are unavailable to regular students.
+
+This flag is independent of the role number — a student remains role `1` but gains extended booking access. Only admins can set this flag.
+
+## How ProtectedRoute enforces roles
+
+On every navigation to a protected route, `ProtectedRoute` makes a live request to `GET /api/usuarios/me/` to fetch the current user's role:
+
+```jsx src/components/ProtectedRoute.jsx
+export default function ProtectedRoute({ allowedRoles }) {
+    const [isAuthorized, setIsAuthorized] = useState(null);
+
+    useEffect(() => {
+        const verificarPermisos = async () => {
+            try {
+                const res = await api.get('usuarios/me/');
+
+                if (allowedRoles.includes(res.data.rol)) {
+                    setIsAuthorized(true);
+                } else {
+                    setIsAuthorized(false);
+                }
+            } catch (error) {
+                // Expired or missing token
+                setIsAuthorized(false);
+            }
+        };
+
+        verificarPermisos();
+    }, [allowedRoles]);
+
+    if (isAuthorized === null) {
+        return <p>Verificando credenciales...</p>;
+    }
+
+    return isAuthorized ? <Outlet /> : <Navigate to="/" replace />;
+}
+```
+
+The check happens on every route change, not just on login. This means:
+
+- If an admin demotes a user while they are logged in, the user will be redirected on their next navigation.
+- If the access token has expired or is missing, `api.get('usuarios/me/')` throws and `isAuthorized` is set to `false`, redirecting to `/`.
+
+## Route group definitions (from App.jsx)
+
+```jsx src/App.jsx
+{/* Roles 1, 2, and 3 */}
+<Route element={<ProtectedRoute allowedRoles={[1, 2, 3]} />}>
+    <Route path="/" element={<Home />} />
+    <Route path="/planes" element={<Planes />} />
+    <Route path="/ficha" element={<FichaFisica />} />
+    <Route path="/reservas" element={<MisReservas />} />
+</Route>
+
+{/* Roles 2 and 3 only */}
+<Route element={<ProtectedRoute allowedRoles={[2, 3]} />}>
+    <Route path="/asistencia" element={<Asistencia />} />
+    <Route path="/entrenador/rutinas" element={<GestorRutinas />} />
+    <Route path="/fichas-alumnos" element={<FichasAlumnos />} />
+</Route>
+
+{/* Role 3 only */}
+<Route element={<ProtectedRoute allowedRoles={[3]} />}>
+    <Route path="/admin/bloques" element={<GestionBloques />} />
+    <Route path="/admin/usuarios" element={<GestionUsuarios />} />
+</Route>
+```
+
+## Related pages
+
+<CardGroup cols={2}>
+  <Card title="Architecture overview" icon="building" href="/technical/architecture">
+    How ProtectedRoute fits into the overall routing structure.
+  </Card>
+  <Card title="Authentication" icon="key" href="/technical/authentication">
+    How users obtain a token and how roles are verified.
+  </Card>
+  <Card title="User management" icon="users" href="/features/user-management">
+    Admin interface for assigning roles and managing accounts.
+  </Card>
+  <Card title="Booking" icon="calendar" href="/features/booking">
+    How the `es_seleccionado` flag affects slot availability.
+  </Card>
+</CardGroup>

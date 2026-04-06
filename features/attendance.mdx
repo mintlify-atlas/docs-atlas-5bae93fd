@@ -1,0 +1,70 @@
+---
+title: "Attendance control"
+description: "Mark student presence or absence for each training block."
+---
+
+The attendance page gives coaches a fast way to take roll call for any training block. The layout is split into two columns: the left panel lists all training blocks scheduled for the selected date, and the right panel shows the enrolled students for whichever block you select.
+
+## Date filter
+
+The date input at the top of the page defaults to today's local date. Changing the date reloads the block list and clears the current selection — no page refresh is needed.
+
+<Note>
+  The block list is filtered on the frontend using the date you select. Only blocks whose date matches the filter are shown.
+</Note>
+
+## Layout overview
+
+| Panel | Content |
+|-------|---------|
+| Left — "Módulos del Día" | All training blocks for the selected date |
+| Right — "Pase de Lista" | Enrolled students for the selected block |
+
+Each block card shows:
+- **Module number** — derived from the block's `codigo_bloque` field (e.g. "MÓDULO 3")
+- **Start time** — displayed as `HH:MM`
+- **Coach name** — or "Sin asignar" if no coach is assigned
+
+## Attendance workflow
+
+<Steps>
+  <Step title="Select a date">
+    Use the date input in the top-right corner. It defaults to today. Selecting a different date immediately refreshes the block list.
+  </Step>
+  <Step title="Select a training block">
+    Click any block card in the left panel. The selected block is highlighted and the right panel loads its student roster.
+  </Step>
+  <Step title="Review the student list">
+    Each enrolled student appears as a row showing their name, RUT, and current attendance status. The total number of enrolled students is shown as a badge next to the block title.
+  </Step>
+  <Step title="Mark attendance">
+    For each student, click one of the two action buttons:
+    - **✅ Presente** — marks the student as present (`PRE`)
+    - **❌ Ausente** — marks the student as absent (`AUS`)
+
+    The active state is highlighted in solid green or red. The list updates instantly without a page reload.
+  </Step>
+</Steps>
+
+## Student row details
+
+Each row in the roster displays:
+
+- **Student name** — extracted from the reservation's `alumno_nombre` field
+- **RUT** — shown below the name in monospace format, parsed from the same field
+- **Sobrecupo badge** — a purple "Sobrecupo" label appears next to the name when the reservation is an overflow (selected athlete) booking, indicated by the `es_sobrecupo` flag
+
+<Info>
+  Attendance is recorded immediately on the backend via a `POST` to `reservas/{id}/marcar_asistencia/`. The UI reflects the change optimistically without waiting for a server response.
+</Info>
+
+## Related pages
+
+<CardGroup cols={2}>
+  <Card title="Schedule management" icon="calendar" href="/features/schedule-management">
+    Create and manage the training blocks that appear in the attendance view.
+  </Card>
+  <Card title="Student records" icon="folder-open" href="/features/student-records">
+    Review physical files and add coaching notes for students in your blocks.
+  </Card>
+</CardGroup>

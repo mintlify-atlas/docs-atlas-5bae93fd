@@ -1,0 +1,58 @@
+---
+title: "My reservations"
+description: "View and manage your training session reservations."
+---
+
+The **Mis Reservas** page shows all reservations you have made — both upcoming and past. Each card displays the day, time, date, and current status of the reservation, and lets you cancel sessions that are still pending.
+
+## Reservation card details
+
+Each card shows:
+
+- **Day and time** — the day of the week and the start time of the training block (e.g., `Lunes | 08:00`)
+- **Date** — the specific date of the reserved session (`Fecha: DD/MM/YYYY`)
+- **Status badge** — a color-coded label indicating the current state of the reservation
+
+## Status badges
+
+| Status | Code | Badge color | Meaning |
+|--------|------|-------------|---------|
+| **Pendiente** | `PEN` | Yellow | Reservation is confirmed and the session hasn't happened yet |
+| **Presente** | `PRE` | Green | You attended the session — marked by the coach |
+| **Ausente (Falta)** | `AUS` | Red | You did not attend — marked as absent by the coach |
+| **Cancelada** | `CAN` | Gray | You cancelled the reservation before the session |
+
+## Cancelling a reservation
+
+Only reservations with **Pendiente** status can be cancelled. The cancel button is disabled for all other statuses.
+
+To cancel a pending reservation:
+
+1. Find the card for the session you want to cancel.
+2. Click **Cancelar Reserva**.
+3. Confirm the action in the dialog that appears.
+
+After cancellation, the reservation status changes to **Cancelada** and the cancel button is replaced with a disabled label reading `Ya no se puede cancelar`.
+
+<Warning>
+  Cancellation is permanent. Once a reservation is cancelled, it cannot be reinstated. You will need to make a new reservation on the [booking page](/features/booking) if spots are still available.
+</Warning>
+
+## Empty state
+
+If you have not made any reservations yet, the page displays:
+
+> No tienes reservas registradas.
+
+Go to [Book a training session](/features/booking) to reserve your first spot.
+
+---
+
+<CardGroup cols={2}>
+  <Card title="Book a training session" icon="calendar-check" href="/features/booking">
+    Reserve a spot in an upcoming training block.
+  </Card>
+  <Card title="Fitness profile" icon="user-check" href="/features/fitness-profile">
+    Maintain your physical data so coaches can tailor your training.
+  </Card>
+</CardGroup>

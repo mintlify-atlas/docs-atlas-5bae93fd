@@ -1,0 +1,71 @@
+---
+title: "Gimnasio USM"
+description: "Role-based gym management platform for Universidad Santa María — book sessions, track fitness, and manage training all in one place."
+---
+
+Gimnasio USM is the official gym management platform for Universidad Santa María. It connects students, coaches, and administrators through a unified interface designed around how the USM gym actually operates — from session booking to personalized training routines.
+
+Whether you're a student reserving your next training block, a coach managing attendance and building custom routines, or an admin controlling the weekly schedule, this platform has a role-specific experience tailored for you.
+
+<CardGroup cols={2}>
+  <Card title="Get started" icon="rocket" href="/getting-started">
+    Set up your account and make your first session reservation in minutes.
+  </Card>
+  <Card title="Student features" icon="dumbbell" href="/features/booking">
+    Book training blocks, view your routines, and track your fitness profile.
+  </Card>
+  <Card title="Coach tools" icon="whistle" href="/features/attendance">
+    Take attendance, build workout plans, and review student fitness records.
+  </Card>
+  <Card title="Admin panel" icon="gear" href="/features/schedule-management">
+    Manage the weekly schedule, control gym status, and assign user roles.
+  </Card>
+</CardGroup>
+
+## What you can do
+
+<CardGroup cols={3}>
+  <Card title="Book sessions" icon="calendar-check" href="/features/booking">
+    Reserve training blocks by day and time slot, with real-time availability.
+  </Card>
+  <Card title="View reservations" icon="list-check" href="/features/my-reservations">
+    Track your upcoming and past reservations, and cancel when needed.
+  </Card>
+  <Card title="Fitness profile" icon="user-check" href="/features/fitness-profile">
+    Record your weight, height, injuries, and training objectives.
+  </Card>
+  <Card title="Training plans" icon="clipboard-list" href="/features/training-plans">
+    Access global and personal workout plans with exercises assigned by your coach.
+  </Card>
+  <Card title="Attendance control" icon="clipboard-user" href="/features/attendance">
+    Coaches mark presence or absence for each student in a training block.
+  </Card>
+  <Card title="Routine builder" icon="pen-ruler" href="/features/routine-manager">
+    Coaches create and assign exercise plans with sets, reps, and rest times.
+  </Card>
+</CardGroup>
+
+## How roles work
+
+Gimnasio USM uses three user roles, each with a different set of features:
+
+| Role | Who | Access |
+|------|-----|--------|
+| **Student (Alumno)** | Gym members | Book sessions, view routines, manage fitness profile |
+| **Coach (Entrenador)** | Gym trainers | Attendance, routine builder, student records |
+| **Admin** | Gym administrators | All coach features + user management + full schedule control |
+
+<Note>
+  Your role is assigned by an administrator. Contact your gym administrator if you need a role change or if you're a new coach or admin joining the platform.
+</Note>
+
+## Technical reference
+
+<CardGroup cols={2}>
+  <Card title="Architecture" icon="sitemap" href="/technical/architecture">
+    Learn how the frontend connects to the Django backend via JWT authentication.
+  </Card>
+  <Card title="API endpoints" icon="code" href="/technical/api-endpoints">
+    Full reference for all backend API endpoints used by the platform.
+  </Card>
+</CardGroup>

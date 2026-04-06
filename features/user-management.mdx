@@ -1,0 +1,99 @@
+---
+title: "User management"
+description: "Assign roles, manage sports branch selections, and control access levels."
+---
+
+The user management page lets admins view every registered user, change their role, and configure selected athlete status. Changes take effect as soon as you save them for each user.
+
+## User table
+
+The table lists all registered users. Each row contains:
+
+- **Usuario / RUT** — the user's full name and their RUT (username), displayed in a monospace format
+- **Rol** — a dropdown to set the user's permission level
+- **¿Seleccionado?** — a toggle to mark the user as a selected athlete (`es_seleccionado`)
+- **Rama Deportiva** — a dropdown for the user's sports branch; only enabled when the selected athlete toggle is on
+- **Acciones** — a **Guardar Cambios** button to persist the row's current values
+
+### Role options
+
+| Value | Label | Access |
+|-------|-------|--------|
+| `1` | Alumno (Student) | Booking, reservations, fitness profile, training plans |
+| `2` | Entrenador (Coach) | Attendance, routine manager, student records, schedule view |
+| `3` | Admin | All coach features plus schedule management and user management |
+
+## Search
+
+A search bar at the top of the page filters the user table in real time. You can search by first name, last name, or RUT.
+
+## Promoting a student to coach
+
+<Steps>
+  <Step title="Find the user">
+    Type the student's name or RUT in the search bar to locate their row.
+  </Step>
+  <Step title="Change the role">
+    Open the **Rol** dropdown on their row and select **2 - Entrenador**.
+  </Step>
+  <Step title="Save">
+    Click **Guardar Cambios**. The user's access level updates immediately — they can now use attendance control, the routine manager, and student records.
+  </Step>
+</Steps>
+
+## Selected athletes
+
+A selected athlete (`es_seleccionado`) is a student who competes on behalf of USM in an official sports branch. This status grants overflow booking privileges and requires a sports branch to be assigned.
+
+<Note>
+  Selected athletes can make reservations even when a training block has reached its regular capacity (`aforo_regular`). This overflow privilege exists specifically for students competing in official USM sports branches.
+</Note>
+
+### Sports branches
+
+The following branches are available to assign:
+
+- Atletismo
+- Basquetbol
+- Balonmano
+- Ciclismo
+- Futsal
+- Futbol
+- Halterofilia
+- Karate
+- Tenis de Mesa
+- Tenis de campo
+- Taekwondo
+- Voleibol
+
+### Designating a student as a selected athlete
+
+<Steps>
+  <Step title="Find the user">
+    Search for the student by name or RUT.
+  </Step>
+  <Step title="Enable the selected athlete toggle">
+    Click the toggle in the **¿Seleccionado?** column. The **Rama Deportiva** dropdown becomes active.
+  </Step>
+  <Step title="Choose a sports branch">
+    Select the student's sports branch from the **Rama Deportiva** dropdown.
+  </Step>
+  <Step title="Save">
+    Click **Guardar Cambios**. The student now has overflow booking access for their assigned branch.
+  </Step>
+</Steps>
+
+<Warning>
+  You must select a sports branch before saving a user with the selected athlete toggle enabled. If the branch field is left empty, the save is blocked and an error is shown.
+</Warning>
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Schedule management" icon="calendar" href="/features/schedule-management">
+    Coaches assigned here appear in the block assignment dropdown on the schedule page.
+  </Card>
+  <Card title="Role system" icon="shield" href="/technical/role-system">
+    Learn how role values map to permissions across the platform.
+  </Card>
+</CardGroup>

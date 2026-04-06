@@ -1,0 +1,139 @@
+---
+title: "Authentication"
+description: "How to authenticate with the Gimnasio USM API using JWT tokens."
+---
+
+Gimnasio USM uses JWT (JSON Web Token) authentication provided by Django REST Framework SimpleJWT. You obtain a token pair by posting credentials to `/api/token/`. The access token must be included in every subsequent request.
+
+## Credentials
+
+The username field accepts the user's **RUT** formatted as `digits-verifier` (for example, `12345678-9`). Passwords are set during registration.
+
+<Note>
+  Tokens are stored in the browser's `localStorage` under the keys `access_token` and `refresh_token`. Anyone with access to the device can read these values, so users should log out on shared machines.
+</Note>
+
+## Login flow
+
+<Steps>
+  <Step title="Format the RUT">
+    Strip all non-numeric characters except the verifier digit (`K` is valid). Insert a hyphen before the last character: `12345678` → `12345678-9`.
+  </Step>
+  <Step title="POST to /api/token/">
+    Send the formatted RUT as `username` along with the user's password.
+  </Step>
+  <Step title="Store the tokens">
+    Save `access` to `localStorage` as `access_token` and `refresh` as `refresh_token`.
+  </Step>
+  <Step title="Include the token in subsequent requests">
+    Add an `Authorization: Bearer <access_token>` header to every request. The Axios instance in `src/api/axios.js` does this automatically.
+  </Step>
+</Steps>
+
+## Login request
+
+<CodeGroup>
+
+```bash curl
+curl -X POST http://localhost:8000/api/token/ \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username": "12345678-9",
+    "password": "your-password"
+  }'
+```
+
+```javascript JavaScript (Axios)
+import api from './src/api/axios';
+
+const response = await api.post('token/', {
+    username: '12345678-9',
+    password: 'your-password'
+});
+
+localStorage.setItem('access_token', response.data.access);
+localStorage.setItem('refresh_token', response.data.refresh);
+```
+
+</CodeGroup>
+
+### Response
+
+```json
+{
+  "access": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "refresh": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}
+```
+
+## Using the token in requests
+
+Include the access token in the `Authorization` header of every authenticated request:
+
+```
+Authorization: Bearer <access_token>
+```
+
+The Axios instance in `src/api/axios.js` handles this automatically via a request interceptor:
+
+```javascript src/api/axios.js
+api.interceptors.request.use((config) => {
+    const token = localStorage.getItem('access_token');
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+});
+```
+
+Every call made through the `api` instance will include the token if one exists in `localStorage`. You do not need to set the header manually when using this client.
+
+## RUT formatting
+
+The login page formats the RUT automatically as the user types. The logic strips non-numeric characters (except `K`) and inserts a hyphen before the final character:
+
+```javascript src/pages/Login.jsx
+const handleRutChange = (e) => {
+    let value = e.target.value;
+
+    // Bypass formatting if the user types letters other than K
+    if (/[a-jl-zñ]/i.test(value)) {
+        setRut(value);
+        return;
+    }
+
+    const clean = value.replace(/[^0-9kK]/g, '').toUpperCase();
+    if (clean.length > 1) {
+        setRut(`${clean.slice(0, -1)}-${clean.slice(-1)}`);
+    } else {
+        setRut(clean);
+    }
+};
+```
+
+The same formatting logic is applied on the registration page (`src/pages/Registro.jsx`).
+
+## Registration
+
+New users register by posting to `POST /api/usuarios/registro/` with the following fields:
+
+| Field | Description |
+|---|---|
+| `username` | Formatted RUT (e.g. `12345678-9`) |
+| `first_name` | Given name(s) |
+| `last_name` | Apellido paterno + apellido materno |
+| `carrera` | Academic programme |
+| `password` | Minimum 8 characters |
+
+After a successful registration, the user can log in immediately using their RUT and password.
+
+## Related pages
+
+<CardGroup cols={2}>
+  <Card title="Architecture overview" icon="building" href="/technical/architecture">
+    How the Axios instance and token interceptor fit into the broader system.
+  </Card>
+  <Card title="Role system" icon="shield" href="/technical/role-system">
+    What each role can do after logging in.
+  </Card>
+</CardGroup>

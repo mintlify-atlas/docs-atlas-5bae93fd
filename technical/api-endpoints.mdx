@@ -1,0 +1,606 @@
+---
+title: "API endpoints"
+description: "Complete reference for all API endpoints used by Gimnasio USM."
+---
+
+All endpoints are relative to the base URL `http://localhost:8000/api/`. Every request except `POST /token/` requires a valid Bearer JWT token in the `Authorization` header — this is handled automatically by the Axios interceptor in `src/api/axios.js`.
+
+See [API overview](/technical/api-overview) for details on authentication and the shared Axios instance.
+
+---
+
+## Authentication
+
+### POST /token/
+
+Exchange a username and password for a JWT access and refresh token pair.
+
+<ParamField body="username" type="string" required>
+  The user's RUT, used as the username in Django.
+</ParamField>
+
+<ParamField body="password" type="string" required>
+  The user's password.
+</ParamField>
+
+<ResponseField name="access" type="string" required>
+  Short-lived JWT access token. Store in `localStorage` under the key `access_token`.
+</ResponseField>
+
+<ResponseField name="refresh" type="string" required>
+  Long-lived JWT refresh token. Store in `localStorage` under the key `refresh_token`.
+</ResponseField>
+
+```bash curl
+curl --request POST \
+  --url http://localhost:8000/api/token/ \
+  --header 'Content-Type: application/json' \
+  --data '{"username": "12345678-9", "password": "your_password"}'
+```
+
+---
+
+## Users
+
+### GET /usuarios/me/
+
+Returns the authenticated user's profile, including their nested fitness file if one exists. Used on initial page load by multiple views to determine the user's role and access level.
+
+<ResponseField name="id" type="number" required>
+  Unique user ID.
+</ResponseField>
+
+<ResponseField name="first_name" type="string" required>
+  User's first name.
+</ResponseField>
+
+<ResponseField name="last_name" type="string" required>
+  User's last name.
+</ResponseField>
+
+<ResponseField name="username" type="string" required>
+  User's RUT, used as the login username.
+</ResponseField>
+
+<ResponseField name="rol" type="number" required>
+  Role level: `1` = student, `2` = coach, `3` = admin.
+</ResponseField>
+
+<ResponseField name="es_seleccionado" type="boolean" required>
+  Whether the user is a selected (varsity) athlete. Selected athletes can book overflow spots when a block is full.
+</ResponseField>
+
+<ResponseField name="ficha_fisica" type="object">
+  The user's fitness file, if one has been created. `null` if the user has not filled in their profile yet.
+
+  <Expandable title="ficha_fisica properties">
+    <ResponseField name="id" type="number">
+      Fitness file ID.
+    </ResponseField>
+    <ResponseField name="peso_kg" type="number">
+      Body weight in kilograms.
+    </ResponseField>
+    <ResponseField name="estatura_cm" type="number">
+      Height in centimeters.
+    </ResponseField>
+    <ResponseField name="lesiones_previas" type="string">
+      Description of previous injuries or physical limitations.
+    </ResponseField>
+    <ResponseField name="objetivo_principal" type="string">
+      The student's main training goal.
+    </ResponseField>
+    <ResponseField name="observaciones_entrenador" type="string">
+      Coach notes, visible to the student in their fitness profile.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+### GET /usuarios/
+
+Returns an array of all registered users. Used by coaches and admins to build student lists for plan assignment and permission management.
+
+<ResponseField name="" type="object[]">
+  Array of user objects. Each object has the same shape as the response from `GET /usuarios/me/`.
+</ResponseField>
+
+### PATCH /usuarios/{id}/actualizar_permisos/
+
+Updates a user's role, selected-athlete status, and sport branch. Restricted to admins.
+
+<ParamField path="id" type="number" required>
+  The ID of the user to update.
+</ParamField>
+
+<ParamField body="rol" type="number" required>
+  New role level: `1` = student, `2` = coach, `3` = admin.
+</ParamField>
+
+<ParamField body="es_seleccionado" type="boolean" required>
+  Whether to grant the user selected-athlete overflow privileges.
+</ParamField>
+
+<ParamField body="rama_deportiva" type="string">
+  The user's sport branch (e.g. `"Atletismo"`, `"Voleibol"`). Required when `es_seleccionado` is `true`.
+</ParamField>
+
+```bash curl
+curl --request PATCH \
+  --url http://localhost:8000/api/usuarios/42/actualizar_permisos/ \
+  --header 'Authorization: Bearer ACCESS_TOKEN' \
+  --header 'Content-Type: application/json' \
+  --data '{"rol": 2, "es_seleccionado": false, "rama_deportiva": ""}'
+```
+
+---
+
+## Training blocks
+
+### GET /bloques/
+
+Returns all training blocks. Used by the home page, attendance view, and schedule management view.
+
+<ResponseField name="" type="object[]">
+  Array of training block objects.
+
+  <Expandable title="block properties">
+    <ResponseField name="id" type="number">
+      Block ID.
+    </ResponseField>
+    <ResponseField name="codigo_bloque" type="string">
+      Block code (e.g. `"B1"`, `"B3"`).
+    </ResponseField>
+    <ResponseField name="fecha" type="string">
+      Date of the block in `YYYY-MM-DD` format.
+    </ResponseField>
+    <ResponseField name="hora_inicio" type="string">
+      Block start time in `HH:MM:SS` format.
+    </ResponseField>
+    <ResponseField name="hora_fin" type="string">
+      Block end time in `HH:MM:SS` format.
+    </ResponseField>
+    <ResponseField name="aforo_regular" type="number">
+      Maximum number of regular spots in the block.
+    </ResponseField>
+    <ResponseField name="cupos_disponibles" type="number">
+      Remaining bookable spots. Derived from `aforo_regular` minus confirmed reservations.
+    </ResponseField>
+    <ResponseField name="entrenador_nombre" type="string">
+      Display name of the assigned coach, or `null` if no coach is assigned.
+    </ResponseField>
+    <ResponseField name="entrenador_a_cargo" type="number">
+      ID of the assigned coach user, or `null`.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+### PATCH /bloques/{id}/modificar_bloque/
+
+Updates the capacity and assigned coach for a specific block. Restricted to admins.
+
+<ParamField path="id" type="number" required>
+  The ID of the block to update.
+</ParamField>
+
+<ParamField body="aforo_regular" type="number" required>
+  New maximum capacity for the block.
+</ParamField>
+
+<ParamField body="entrenador_a_cargo" type="number">
+  ID of the user to assign as coach. Pass `null` to unassign.
+</ParamField>
+
+```bash curl
+curl --request PATCH \
+  --url http://localhost:8000/api/bloques/5/modificar_bloque/ \
+  --header 'Authorization: Bearer ACCESS_TOKEN' \
+  --header 'Content-Type: application/json' \
+  --data '{"aforo_regular": 20, "entrenador_a_cargo": 7}'
+```
+
+### DELETE /bloques/{id}/
+
+Deletes a training block. All student reservations for that block are cancelled as a result. Restricted to admins.
+
+<ParamField path="id" type="number" required>
+  The ID of the block to delete.
+</ParamField>
+
+### GET /bloques/{id}/reservas_hoy/
+
+Returns all reservations for a specific block. Used by the attendance view to show the student roster for roll call.
+
+<ParamField path="id" type="number" required>
+  The ID of the block.
+</ParamField>
+
+<ResponseField name="" type="object[]">
+  Array of reservation objects for the block.
+
+  <Expandable title="reservation properties">
+    <ResponseField name="id" type="number">
+      Reservation ID.
+    </ResponseField>
+    <ResponseField name="alumno_nombre" type="string">
+      Student's full name and RUT in the format `"Nombre Apellido (RUT)"`.
+    </ResponseField>
+    <ResponseField name="estado" type="string">
+      Current attendance status: `"PEN"` (pending), `"PRE"` (present), `"AUS"` (absent), or `"CAN"` (cancelled).
+    </ResponseField>
+    <ResponseField name="es_sobrecupo" type="boolean">
+      Whether this is an overflow booking made by a selected athlete.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+---
+
+## Reservations
+
+### GET /reservas/
+
+Returns all reservations belonging to the authenticated user. Admins see all reservations.
+
+<ResponseField name="" type="object[]">
+  Array of reservation objects.
+
+  <Expandable title="reservation properties">
+    <ResponseField name="id" type="number">
+      Reservation ID.
+    </ResponseField>
+    <ResponseField name="bloque_detalle" type="object">
+      Nested block details including `dia` (weekday name) and `hora_inicio`.
+    </ResponseField>
+    <ResponseField name="fecha_especifica" type="string">
+      The specific date of the reservation in `YYYY-MM-DD` format.
+    </ResponseField>
+    <ResponseField name="estado" type="string">
+      `"PEN"`, `"PRE"`, `"AUS"`, or `"CAN"`.
+    </ResponseField>
+    <ResponseField name="alumno_nombre" type="string">
+      Student name, included when the response is seen by an admin.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+### POST /reservas/
+
+Creates a new reservation for the authenticated user.
+
+<ParamField body="bloque" type="number" required>
+  ID of the training block to reserve.
+</ParamField>
+
+<ParamField body="fecha_especifica" type="string" required>
+  The specific date for the reservation in `YYYY-MM-DD` format. This is the `fecha` field from the block object.
+</ParamField>
+
+```bash curl
+curl --request POST \
+  --url http://localhost:8000/api/reservas/ \
+  --header 'Authorization: Bearer ACCESS_TOKEN' \
+  --header 'Content-Type: application/json' \
+  --data '{"bloque": 3, "fecha_especifica": "2026-04-07"}'
+```
+
+### POST /reservas/{id}/cancelar/
+
+Cancels an existing reservation. The reservation must be in `"PEN"` status. Sends no request body.
+
+<ParamField path="id" type="number" required>
+  The ID of the reservation to cancel.
+</ParamField>
+
+### POST /reservas/{id}/marcar_asistencia/
+
+Records attendance for a student in a block. Used by coaches on the attendance page.
+
+<ParamField path="id" type="number" required>
+  The ID of the reservation to update.
+</ParamField>
+
+<ParamField body="estado" type="string" required>
+  Attendance status to set. Must be `"PRE"` (present) or `"AUS"` (absent).
+</ParamField>
+
+```bash curl
+curl --request POST \
+  --url http://localhost:8000/api/reservas/18/marcar_asistencia/ \
+  --header 'Authorization: Bearer ACCESS_TOKEN' \
+  --header 'Content-Type: application/json' \
+  --data '{"estado": "PRE"}'
+```
+
+---
+
+## Fitness files
+
+### GET /fichafisica/
+
+Returns the fitness file for the authenticated user.
+
+<ResponseField name="id" type="number" required>
+  Fitness file ID.
+</ResponseField>
+
+<ResponseField name="peso_kg" type="number">
+  Body weight in kilograms.
+</ResponseField>
+
+<ResponseField name="estatura_cm" type="number">
+  Height in centimeters.
+</ResponseField>
+
+<ResponseField name="lesiones_previas" type="string">
+  Previous injuries or physical limitations.
+</ResponseField>
+
+<ResponseField name="objetivo_principal" type="string">
+  Main training goal.
+</ResponseField>
+
+<ResponseField name="observaciones_entrenador" type="string">
+  Coach notes visible to the student.
+</ResponseField>
+
+### POST /fichafisica/
+
+Creates a new fitness file for the authenticated user. Called when the user submits the fitness form for the first time.
+
+<ParamField body="peso_kg" type="number" required>
+  Body weight in kilograms.
+</ParamField>
+
+<ParamField body="estatura_cm" type="number" required>
+  Height in centimeters.
+</ParamField>
+
+<ParamField body="lesiones_previas" type="string" required>
+  Previous injuries or physical limitations.
+</ParamField>
+
+<ParamField body="objetivo_principal" type="string" required>
+  Main training goal.
+</ParamField>
+
+### PATCH /fichafisica/{id}/
+
+Updates an existing fitness file. Uses the same body fields as `POST /fichafisica/`.
+
+<ParamField path="id" type="number" required>
+  The ID of the fitness file to update.
+</ParamField>
+
+<ParamField body="peso_kg" type="number">
+  Updated body weight in kilograms.
+</ParamField>
+
+<ParamField body="estatura_cm" type="number">
+  Updated height in centimeters.
+</ParamField>
+
+<ParamField body="lesiones_previas" type="string">
+  Updated injury description.
+</ParamField>
+
+<ParamField body="objetivo_principal" type="string">
+  Updated training goal.
+</ParamField>
+
+### GET /fichafisica/por_alumno/
+
+Returns the fitness file for a specific student by their user ID. Used by coaches on the student records page.
+
+<ParamField query="alumno_id" type="number" required>
+  The ID of the student whose fitness file to retrieve.
+</ParamField>
+
+```bash curl
+curl --request GET \
+  --url 'http://localhost:8000/api/fichafisica/por_alumno/?alumno_id=15' \
+  --header 'Authorization: Bearer ACCESS_TOKEN'
+```
+
+### PATCH /fichafisica/{id}/actualizar_nota/
+
+Updates the coach's notes on a student's fitness file. Only the `observaciones_entrenador` field is written — student data is not affected.
+
+<ParamField path="id" type="number" required>
+  The ID of the fitness file to update.
+</ParamField>
+
+<ParamField body="observaciones_entrenador" type="string" required>
+  The updated coach notes. This text is visible to the student in their fitness profile.
+</ParamField>
+
+---
+
+## Training plans
+
+### GET /planes/
+
+Returns plans visible to the authenticated user. The backend filters automatically: students receive global plans and plans personally assigned to them; coaches and admins receive all plans.
+
+<ResponseField name="" type="object[]">
+  Array of training plan objects.
+
+  <Expandable title="plan properties">
+    <ResponseField name="id" type="number">
+      Plan ID.
+    </ResponseField>
+    <ResponseField name="titulo" type="string">
+      Plan title.
+    </ResponseField>
+    <ResponseField name="es_global" type="boolean">
+      Whether the plan is global (visible to all students) or personal (assigned to one student).
+    </ResponseField>
+    <ResponseField name="alumno_asignado" type="number">
+      ID of the student the plan is assigned to. `null` for global plans.
+    </ResponseField>
+    <ResponseField name="fecha_vencimiento" type="string">
+      Plan expiry date in `YYYY-MM-DD` format.
+    </ResponseField>
+    <ResponseField name="creado_por_nombre" type="string">
+      Display name of the coach who created the plan.
+    </ResponseField>
+    <ResponseField name="rutina_interactiva" type="object[]">
+      Array of routine detail entries (exercises) attached to this plan. Each entry includes the exercise details nested under `ejercicio_detalle`.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+### POST /planes/
+
+Creates a new training plan. Restricted to coaches and admins.
+
+<ParamField body="titulo" type="string" required>
+  Plan title.
+</ParamField>
+
+<ParamField body="es_global" type="boolean" required>
+  Set to `true` to make the plan visible to all students. Set to `false` to assign it to a specific student.
+</ParamField>
+
+<ParamField body="alumno_asignado" type="number">
+  ID of the student to assign the plan to. Required when `es_global` is `false`. Pass `null` for global plans.
+</ParamField>
+
+<ParamField body="fecha_vencimiento" type="string" required>
+  Plan expiry date in `YYYY-MM-DD` format.
+</ParamField>
+
+---
+
+## Exercises
+
+### GET /ejercicios/
+
+Returns all exercises in the catalogue.
+
+<ResponseField name="" type="object[]">
+  Array of exercise objects.
+
+  <Expandable title="exercise properties">
+    <ResponseField name="id" type="number">
+      Exercise ID.
+    </ResponseField>
+    <ResponseField name="nombre" type="string">
+      Exercise name (e.g. `"Press Banca"`).
+    </ResponseField>
+    <ResponseField name="grupo_muscular" type="string">
+      Target muscle group (e.g. `"Pecho"`).
+    </ResponseField>
+    <ResponseField name="descripcion" type="string">
+      Coaching tips or a description of the movement.
+    </ResponseField>
+    <ResponseField name="video_url" type="string">
+      URL of a tutorial video. Empty string if none provided.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+### POST /ejercicios/
+
+Adds a new exercise to the catalogue. Restricted to coaches and admins.
+
+<ParamField body="nombre" type="string" required>
+  Exercise name.
+</ParamField>
+
+<ParamField body="grupo_muscular" type="string" required>
+  Target muscle group.
+</ParamField>
+
+<ParamField body="descripcion" type="string">
+  Coaching tips or movement description.
+</ParamField>
+
+<ParamField body="video_url" type="string">
+  URL of a tutorial video (YouTube or other). Optional.
+</ParamField>
+
+---
+
+## Routine details
+
+### POST /detallerutina/
+
+Adds an exercise entry to a training plan, including prescription details. Restricted to coaches and admins.
+
+<ParamField body="plan" type="number" required>
+  ID of the training plan to add the exercise to.
+</ParamField>
+
+<ParamField body="ejercicio" type="number" required>
+  ID of the exercise from the catalogue.
+</ParamField>
+
+<ParamField body="series" type="number" required>
+  Number of sets.
+</ParamField>
+
+<ParamField body="repeticiones" type="string" required>
+  Repetition target. Accepts ranges (e.g. `"10-12"`) or fixed values (e.g. `"10"`).
+</ParamField>
+
+<ParamField body="descanso_segundos" type="number" required>
+  Rest time between sets, in seconds.
+</ParamField>
+
+<ParamField body="notas" type="string">
+  Additional coaching notes for this exercise in this plan.
+</ParamField>
+
+---
+
+## Configuration
+
+### GET /configuracion/
+
+Returns the current global gym configuration. Used on the home page to determine whether to show the booking interface or a closed-gym message.
+
+<ResponseField name="gimnasio_abierto" type="boolean" required>
+  Whether the gym is currently open. When `false`, the home page shows the closure message instead of the block schedule.
+</ResponseField>
+
+<ResponseField name="mensaje_cierre" type="string" required>
+  The message to display to students when the gym is closed (e.g. `"Cerrado por Vacaciones de Invierno"`).
+</ResponseField>
+
+### PATCH /configuracion/
+
+Updates the global gym configuration. Restricted to admins.
+
+<ParamField body="gimnasio_abierto" type="boolean" required>
+  Set to `false` to close the gym and display the closure message on the home page.
+</ParamField>
+
+<ParamField body="mensaje_cierre" type="string">
+  The closure reason to display to students. Only shown when `gimnasio_abierto` is `false`.
+</ParamField>
+
+```bash curl
+curl --request PATCH \
+  --url http://localhost:8000/api/configuracion/ \
+  --header 'Authorization: Bearer ACCESS_TOKEN' \
+  --header 'Content-Type: application/json' \
+  --data '{"gimnasio_abierto": false, "mensaje_cierre": "Cerrado por Vacaciones de Invierno"}'
+```
+
+---
+
+## Related pages
+
+<CardGroup cols={2}>
+  <Card title="API overview" icon="plug" href="/technical/api-overview">
+    Base URL, authentication, and resource groups.
+  </Card>
+  <Card title="Authentication" icon="key" href="/technical/authentication">
+    JWT login flow and the Axios interceptor.
+  </Card>
+  <Card title="Local setup" icon="laptop" href="/technical/local-setup">
+    Run the frontend and backend together locally.
+  </Card>
+  <Card title="Architecture overview" icon="diagram-project" href="/technical/architecture">
+    How the React SPA and Django backend fit together.
+  </Card>
+</CardGroup>

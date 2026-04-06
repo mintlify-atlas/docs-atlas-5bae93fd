@@ -1,0 +1,114 @@
+{
+  "projectType": "saas",
+  "projectName": "Gimnasio USM",
+  "projectDescription": "A role-based gym management platform for Universidad Santa María that lets students book training sessions, track fitness profiles, and view routines, while coaches and admins manage schedules, attendance, and users.",
+  "theme": "almond",
+  "primaryColor": "#747474",
+  "lightColor": "#0b0b0b",
+  "darkColor": "#b5b5b5",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "introduction",
+              "getting-started"
+            ]
+          },
+          {
+            "group": "Student Features",
+            "pages": [
+              "features/booking",
+              "features/my-reservations",
+              "features/fitness-profile",
+              "features/training-plans"
+            ]
+          },
+          {
+            "group": "Coach Features",
+            "pages": [
+              "features/attendance",
+              "features/routine-manager",
+              "features/student-records"
+            ]
+          },
+          {
+            "group": "Admin Features",
+            "pages": [
+              "features/schedule-management",
+              "features/user-management"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Technical Reference",
+        "groups": [
+          {
+            "group": "Architecture",
+            "pages": [
+              "technical/architecture",
+              "technical/authentication",
+              "technical/role-system"
+            ]
+          },
+          {
+            "group": "API Integration",
+            "pages": [
+              "technical/api-overview",
+              "technical/api-endpoints"
+            ]
+          },
+          {
+            "group": "Development",
+            "pages": [
+              "technical/local-setup",
+              "technical/deployment"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "Role-based access control with three user types: Student (Alumno), Coach (Entrenador), and Admin",
+    "Session booking system with capacity management and overflow slots for selected athletes",
+    "Personal fitness profile with weight, height, injuries, and objectives tracked per student",
+    "Routine builder for coaches to create global or personalized training plans with exercises",
+    "Attendance tracking system for coaches to mark presence/absence per training block",
+    "Student records viewer for coaches to review physical files and add coach notes",
+    "Admin schedule management with a master gym open/close toggle and closure messages",
+    "User permission management for assigning roles and sports branch (sports selection) status",
+    "JWT-based authentication using Chilean RUT as the username identifier",
+    "Accordion-style weekly schedule grouped by day for an intuitive booking UX"
+  ],
+  "publicApiSurface": [
+    "POST /api/token/ — Obtain JWT access and refresh tokens",
+    "GET /api/usuarios/me/ — Get current authenticated user profile",
+    "GET /api/usuarios/ — List all users (admin/coach)",
+    "PATCH /api/usuarios/{id}/actualizar_permisos/ — Update user role and sports selection",
+    "GET /api/bloques/ — List available training blocks",
+    "PATCH /api/bloques/{id}/modificar_bloque/ — Update block capacity and assigned coach",
+    "DELETE /api/bloques/{id}/ — Delete a training block",
+    "GET /api/bloques/{id}/reservas_hoy/ — Get reservations for a specific block",
+    "POST /api/reservas/ — Create a new session reservation",
+    "POST /api/reservas/{id}/cancelar/ — Cancel a reservation",
+    "POST /api/reservas/{id}/marcar_asistencia/ — Mark attendance for a reservation",
+    "GET /api/reservas/ — List user's reservations",
+    "GET /api/fichafisica/ — Get physical fitness file",
+    "POST /api/fichafisica/ — Create a physical fitness file",
+    "PATCH /api/fichafisica/{id}/ — Update a physical fitness file",
+    "GET /api/fichafisica/por_alumno/?alumno_id={id} — Get a student's fitness file (coach)",
+    "PATCH /api/fichafisica/{id}/actualizar_nota/ — Update coach notes on a fitness file",
+    "GET /api/planes/ — List training plans visible to the user",
+    "POST /api/planes/ — Create a new training plan",
+    "GET /api/ejercicios/ — List exercise catalog",
+    "POST /api/ejercicios/ — Add an exercise to the catalog",
+    "POST /api/detallerutina/ — Add an exercise to a training plan",
+    "GET /api/configuracion/ — Get gym configuration (open/close status)",
+    "PATCH /api/configuracion/ — Update gym configuration"
+  ]
+}

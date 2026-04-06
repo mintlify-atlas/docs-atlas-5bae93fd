@@ -1,0 +1,77 @@
+---
+title: "Book a training session"
+description: "Browse available training blocks by day and reserve your spot."
+---
+
+The booking page shows all upcoming training blocks organized by date. You can expand each day to see available modules, check spots and coach assignments, and reserve your place with a single click.
+
+## How the weekly schedule works
+
+Training blocks are grouped by date and displayed in an accordion layout. When the page loads, it automatically expands to the first available day so you can see upcoming slots immediately. Click any day header to expand or collapse it.
+
+Each expanded day shows a grid of block cards — one card per training module offered that day.
+
+## Reading a block card
+
+Each card shows:
+
+- **Module number** — derived from the block code (e.g., `B3` displays as `MÓDULO 3`)
+- **Time slot** — start and end time in `HH:MM` format (e.g., `08:00 - 09:00`)
+- **Available spots** — displayed prominently; green when spots remain, red when the block is full
+- **Coach** — the assigned trainer's name, or `Por asignar` if not yet assigned
+
+## Booking flow
+
+<Steps>
+  <Step title="Open the booking page">
+    Navigate to **Reserva de Horarios** from the navigation bar. The page loads your training blocks and auto-expands the first available day.
+  </Step>
+  <Step title="Select a day">
+    Click the day header button to expand it. The header shows the day name, formatted date, and the number of blocks available for that day.
+  </Step>
+  <Step title="Choose a module">
+    Browse the block cards. Check the time slot, available spots, and coach name to find the session that works for you.
+  </Step>
+  <Step title="Reserve your spot">
+    Click the **Reservar** button on the card. A confirmation message appears when the reservation is created successfully.
+  </Step>
+</Steps>
+
+## Reservation button states
+
+The button on each block card changes based on availability and your student type:
+
+| State | Button label | Who sees it |
+|-------|-------------|-------------|
+| Spots available | **Reservar** | All students |
+| Block full — selected athlete | **Reservar (Sobrecupo)** | `es_seleccionado` students only |
+| Block full — regular student | **Agotado** (disabled) | Regular students |
+
+<Note>
+  Selected athletes (`es_seleccionado`) can reserve a spot even when a block is fully booked. This overflow reservation is called a **sobrecupo**. The block still shows zero available spots, but the reservation is accepted. Contact your gym administrator if you believe you should have selected athlete status.
+</Note>
+
+## Gym closed state
+
+When an administrator closes the gym, the booking page is replaced with a closure notice instead of showing the schedule. The notice displays the message set by the admin (for example, "Closed for maintenance" or holiday information).
+
+No blocks are loaded while the gym is marked as closed. Check back later or contact your administrator for reopening details.
+
+## No blocks available
+
+If the gym is open but no upcoming blocks have been configured, the page displays:
+
+> No hay módulos disponibles por el momento. Vuelve a revisar más tarde.
+
+This means the admin has not yet published training blocks for the coming days. Check again later.
+
+---
+
+<CardGroup cols={2}>
+  <Card title="My reservations" icon="list-check" href="/features/my-reservations">
+    View the status of your reservations and cancel if needed.
+  </Card>
+  <Card title="Fitness profile" icon="user-check" href="/features/fitness-profile">
+    Keep your physical data up to date for your coach.
+  </Card>
+</CardGroup>

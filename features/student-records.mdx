@@ -1,0 +1,63 @@
+---
+title: "Student records"
+description: "Review student physical files and add coaching notes before building routines."
+---
+
+The student records page — labelled "Expedientes Físicos" in the interface — gives coaches access to each student's physical file and a dedicated panel for writing coaching notes. Review this information before building a personalized routine.
+
+## Finding a student
+
+At the top of the page, a smart search dropdown lets you locate any student by typing their name or RUT. The list is filtered in real time as you type, and each entry shows the student's full name followed by their RUT in parentheses.
+
+Click a name in the dropdown to load their record. Click **✖ Quitar selección** in the dropdown to clear the selection and return to the empty state.
+
+## Reviewing a student's physical file
+
+<Steps>
+  <Step title="Select a student">
+    Use the smart search dropdown to find and select a student. Their physical file loads automatically below the search bar.
+  </Step>
+  <Step title="Check the physical data">
+    The physical file is displayed in a two-column layout with a dark header labelled **Ficha Física** and a **Confidencial** badge.
+
+    The left column contains:
+    - **Peso** — body weight in kilograms
+    - **Estatura** — height in centimetres
+    - **Lesiones Previas o Dolencias** — any prior injuries or chronic pain reported by the student
+    - **Objetivo Principal** — the student's stated training goal
+
+    <Note>
+      Fields that the student has not filled in display as `--` (for numeric values) or a default message such as "Ninguna reportada por el alumno."
+    </Note>
+  </Step>
+  <Step title="Add or update coaching notes">
+    The right column contains the **Notas del Coach** panel. Type your observations, progress notes, or special considerations into the text area.
+
+    <Tip>
+      These notes are visible to the student in their own profile. Write notes that are useful for the student to read, not just internal reminders.
+    </Tip>
+
+    Click **Guardar Observaciones** to save. The button shows "Guardando..." while the request is in progress.
+  </Step>
+</Steps>
+
+## Warning: student has not filled their profile
+
+If the selected student has not completed their physical file, the page shows a warning panel instead of the file contents:
+
+<Warning>
+  The student's file cannot be loaded until they fill in their medical record from their own profile. Contact the student and ask them to complete their fitness profile before you build their routine.
+</Warning>
+
+The warning message reads: *"Dile al alumno que debe rellenar su ficha médica desde su perfil."*
+
+## Related pages
+
+<CardGroup cols={2}>
+  <Card title="Routine manager" icon="pen-ruler" href="/features/routine-manager">
+    Build a personalized training plan for the student after reviewing their record.
+  </Card>
+  <Card title="Fitness profile (student view)" icon="user-check" href="/features/fitness-profile">
+    See how students fill in the physical data you review here.
+  </Card>
+</CardGroup>
